@@ -14,6 +14,7 @@ X = list()
 Y = list()
 Z = list()
 W = list()
+U = list()
 for i in f:
     linha = i[:-1].split(";")
     x_tmp = list()
@@ -48,14 +49,11 @@ for i in f:
     Z.append(linha[1])
     a = linha[1].split("-")
     W.append(str(a[0])+"-"+str(a[1])+"-"+str(a[2])+"-"+str(a[3])+"-"+str(a[4]))
+    U.append(linha[1])
 #
 f.close()
 #
 #X_train, X_test, Y_train, Y_test, Z_train, Z_test = train_test_split(X, Y, Z, test_size=0.3)
-#
-for i in W:
-    print(i)
-exit(0)
 #
 Z_test = list()
 Z_train = list()
@@ -70,15 +68,38 @@ for i in f:
         Z_test.append(img)
 f.close()
 #
-exit(0)
+X_test = list()
+Y_test = list()
+U_test = list()
+X_train = list()
+Y_train = list()
+U_train = list()
+for i in range(len(X)):
+    if(W[i] in Z_test):
+        X_test.append(X[i])
+        Y_test.append(Y[i])
+        U_test.append(U[i])
+    if(W[i] in Z_train):
+        X_train.append(X[i])
+        Y_train.append(Y[i])
+        U_train.append(U[i])
+#
+del X
+del Y
+del U
+del Z_test
+del Z_train
+#
+print(len(X_test), len(X_train))
+#
 #
 #
 tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1, 8e-1, 7e-1, 6e-1, 4e-1, 2e-1, 1e-1],
                      'C': [5e-1, 5, 50, 500, 5000, 60000]},
                     {'kernel': ['linear'], 'C': [1e-1, 1, 10, 100, 1000, 5000]}]
 #
-clf = GridSearchCV(SVC(probability=True), tuned_parameters, cv=5, scoring='accuracy', n_jobs=4)
-#clf = SVC()
+#clf = GridSearchCV(SVC(probability=True), tuned_parameters, cv=5, scoring='accuracy', n_jobs=4)
+clf = SVC()
 clf.fit(X_train, Y_train)
 #
 print(clf.score(X_test, Y_test))
