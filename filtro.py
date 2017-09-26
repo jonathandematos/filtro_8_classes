@@ -51,26 +51,29 @@ X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.3)
 del X
 del Y
 #
-#tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1, 8e-1, 7e-1, 6e-1, 4e-1, 2e-1, 1e-1],
-#                     'C': [5e-1, 5, 50, 500, 5000, 60000]},
-#                    {'kernel': ['linear'], 'C': [1e-1, 1, 10, 100, 1000, 5000]}]
-##
-#clf = GridSearchCV(SVC(), probability=True, tuned_parameters, cv=5, scoring='accuracy')
-#clf.fit(X_train, Y_train)
-##
-#print_parameters(clf)
-##
+tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1, 8e-1, 7e-1, 6e-1, 4e-1, 2e-1, 1e-1],
+                     'C': [5e-1, 5, 50, 500, 5000, 60000]},
+                    {'kernel': ['linear'], 'C': [1e-1, 1, 10, 100, 1000, 5000]}]
+#
 if( os.path.exists("classificador_crc.pkl") == True ):
     clf = joblib.load("classificador_crc.pkl")
 else:
-    clf = SVC(probability=True)
+    #
+    clf = GridSearchCV(SVC(probability=True), tuned_parameters, cv=5, scoring='accuracy', n_jobs=4)
     clf.fit(X_train, Y_train)
+    #
+    print_parameters(clf)
+    #
+    #clf = SVC(probability=True)
+    #clf.fit(X_train, Y_train)
     joblib.dump(clf, "classificador_crc.pkl")
 #
-#print(clf.score(X_test, Y_test))
+print(clf.score(X_test, Y_test))
+#
 #############################
 # LOADING BREAKHIS
 #############################
+#
 f = open("svm_tissues/pftas_file_150.txt","r")
 #
 X = list()
@@ -114,11 +117,13 @@ f.close()
 #
 #np_X = np.array([X])
 #
+f = open("pftas_filtro_150.txt","w")
 for i in range(len(X)):
     pred = clf.predict_proba(np.array([X[i]]))
     if(pred.argmax() == 0):
-        print("\n{};{};".format(Y[i], Z[i]), end="")
+        f.write("\n{};{};".format(Y[i], Z[i]))
         for j in X[i]:
-            print("{:.6f};".format(j),end="")
+            f.write("{:.6f};".format(j))
 #
+f.close()
 exit(0)

@@ -13,6 +13,7 @@ f = open("svm_tissues/pftas_file_150.txt","r")
 X = list()
 Y = list()
 Z = list()
+W = list()
 for i in f:
     linha = i[:-1].split(";")
     x_tmp = list()
@@ -45,10 +46,32 @@ for i in f:
     #
     Y.append(class_line)
     Z.append(linha[1])
+    a = linha[1].split("-")
+    W.append(str(a[0])+"-"+str(a[1])+"-"+str(a[2])+"-"+str(a[3])+"-"+str(a[4]))
 #
 f.close()
 #
-X_train, X_test, Y_train, Y_test, Z_train, Z_test = train_test_split(X, Y, Z, test_size=0.3)
+#X_train, X_test, Y_train, Y_test, Z_train, Z_test = train_test_split(X, Y, Z, test_size=0.3)
+#
+for i in W:
+    print(i)
+exit(0)
+#
+Z_test = list()
+Z_train = list()
+#
+f = open("svm_tissues/dsfold1.txt","r")
+for i in f:
+    linha = i[:-1].split("|")
+    img = linha[0].split(".")[0]
+    if(linha[3] == "train"):
+        Z_train.append(img)
+    else:
+        Z_test.append(img)
+f.close()
+#
+exit(0)
+#
 #
 tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1, 8e-1, 7e-1, 6e-1, 4e-1, 2e-1, 1e-1],
                      'C': [5e-1, 5, 50, 500, 5000, 60000]},
