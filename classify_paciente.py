@@ -139,8 +139,8 @@ tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1, 5e-1, 2e-1, 1e-1],
                      'C': [5e-1, 5, 50, 500]},
                     {'kernel': ['linear'], 'C': [1e-1, 1, 10]}]
 #
-#clf = GridSearchCV(SVC(probability=True), tuned_parameters, cv=5, scoring='accuracy', n_jobs=4)
-clf = SVC(probability=True)
+clf = GridSearchCV(SVC(probability=True), tuned_parameters, cv=5, scoring='accuracy', n_jobs=12)
+#clf = SVC(probability=True)
 clf.fit(X_train, Y_train)
 #
 #print(clf.score(X_test, Y_test))
