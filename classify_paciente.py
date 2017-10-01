@@ -6,6 +6,8 @@ from sklearn.svm import SVC
 import numpy as np
 import joblib
 import os, sys
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
 #
 #
 #
@@ -135,12 +137,14 @@ del Z_train
 #
 #
 #
-tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1, 5e-1, 2e-1, 1e-1],
-                     'C': [5e-1, 5, 50, 500]},
-                    {'kernel': ['linear'], 'C': [1e-1, 1, 10]}]
+#tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1, 5e-1, 2e-1, 1e-1],
+#                     'C': [5e-1, 5, 50, 500]},
+#                    {'kernel': ['linear'], 'C': [1e-1, 1, 10]}]
 #
-clf = GridSearchCV(SVC(probability=True), tuned_parameters, cv=5, scoring='accuracy', n_jobs=12)
+#clf = GridSearchCV(SVC(probability=True), tuned_parameters, cv=5, scoring='accuracy', n_jobs=2)
 #clf = SVC(probability=True)
+clf = DecisionTreeClassifier()
+#clf = RandomForestClassifier()
 clf.fit(X_train, Y_train)
 #
 #print(clf.score(X_test, Y_test))
@@ -158,6 +162,10 @@ for i in range(len(X_test)):
     img = str(str_img[2])+str(str_img[3])+str(str_img[4])
     pac = str(str_img[2])
     pred = np.squeeze(clf.predict_proba(np.array([X_test[i]])))
+    print("{};{};".format(U_test[i], Y_test[i]), end="")
+    for j in pred:
+        print("{:.6f};".format(j), end="")
+    print()
     #
     if(np.argmax(pred) == Y_test[i]):
         correto += 1
@@ -180,7 +188,7 @@ for i in range(len(X_test)):
 #pacs = joblib.load("pacs.pkl")
 #imgs = joblib.load("imgs.pkl")
 #print(pacs)
-#exit(0)
+exit(0)
 print("Patches: {}".format(float(correto)/total))
 correto = 0
 total = 0
