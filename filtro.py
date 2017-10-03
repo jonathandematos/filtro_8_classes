@@ -26,21 +26,22 @@ X = list()
 Y = list()
 for i in f:
 	linha = i[:-1].split(";")
-        x_tmp = list()
-        for j in linha[2:-1]:
-            x_tmp.append(float(j))
-        if(len(x_tmp) != 162):
-            continue
-        X.append(x_tmp)
 	c = int(linha[0][0:2])
-	#
-	# 0 - importante
-	# 1 - irrelevante
-	#
-	if(c > 4):
-		Y.append(1)
-	else:
-		Y.append(0)
+        if(c == 8 or c == 1):
+            x_tmp = list()
+            for j in linha[2:-1]:
+                x_tmp.append(float(j))
+            if(len(x_tmp) != 162):
+                continue
+            X.append(x_tmp)
+            #
+            # 0 - importante
+            # 1 - irrelevante
+            #
+            if(c > 2):
+                Y.append(1)
+            else:
+                Y.append(0)
 #
 f.close()
 #############################
@@ -117,7 +118,7 @@ f.close()
 #
 #np_X = np.array([X])
 #
-f = open("pftas_filtro_150.txt","w")
+f = open("pftas_filtro_150_3.txt","w")
 for i in range(len(X)):
     pred = clf.predict_proba(np.array([X[i]]))
     if(pred.argmax() == 0):

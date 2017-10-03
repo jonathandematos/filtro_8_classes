@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-arquivos=("pftas_filtro_150.txt" "svm_tissues/pftas_file_150.txt")
+#arquivos=("pftas_filtro_150.txt" "svm_tissues/pftas_file_150.txt")
+arquivos=("pftas_filtro_150_3.txt")
 ampliacao=(40 100 200 400)
 fold=(1 2 3 4 5)
 #
@@ -10,7 +11,7 @@ do
 	do
 		for j in ${fold[@]};
 		do
-			./classify_paciente.py $k "svm_tissues/dsfold"$j".txt" $i >> classify_paciente_filtro.txt 
+			./generate_sets.py $k "svm_tissues/dsfold"$j".txt" $i
 		done
 	done
 done
