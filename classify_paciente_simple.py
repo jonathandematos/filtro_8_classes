@@ -21,6 +21,20 @@ pftas_file_test = sys.argv[2]
 #
 print("Argumentos: {}".format(sys.argv))
 #
+#
+#
+def print_parameters(clf):
+    print("Best parameters with score {:.5f}% set found on development set:".format(clf.best_score_))
+    print(clf.best_estimator_)
+    print()
+    print("Grid scores on development set:")
+    print()
+    means = clf.cv_results_['mean_test_score']
+    stds = clf.cv_results_['std_test_score']
+    for mean, std, params in zip(means, stds, clf.cv_results_['params']):
+        print("%0.3f (+/-%0.03f) for %r" % (mean, std * 2, params))
+
+#
 # Combine results by vote
 #
 def CombineByVote(results):
@@ -114,22 +128,24 @@ X_test, Y_test, Z_train = LoadDataset(pftas_file_test)
 #
 #
 #
-#tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1, 1e-1, 10],
-#                     'C': [5e-1, 50, 5000, 50000]}]
-#                    {'kernel': ['linear'], 'C': [1e-1, 1, 10]}]
 tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1, 1e-1, 10],
-                     'C': [50000, 150000, 300000]}]
+                     'C': [5e-1, 50, 5000, 50000]}]
+#                    {'kernel': ['linear'], 'C': [1e-1, 1, 10]}]
+#tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1, 1e-1, 10],
+#                     'C': [50000, 150000, 300000]}]
 #
-clf = GridSearchCV(SVC(probability=True), tuned_parameters, cv=5, scoring='accuracy', n_jobs=2, verbose=4)
+clf = GridSearchCV(SVC(probability=True), tuned_parameters, cv=5, scoring='accuracy', n_jobs=2)
 #clf = SVC(probability=True)
 #clf = DecisionTreeClassifier()
 #clf = RandomForestClassifier()
 #X_train, X_test, Y_train, Y_test = train_test_split(X,Y, test_size=0.30)
 clf.fit(X_train, Y_train)
 #
-print(clf.score(X_test, Y_test))
+#print(clf.score(X_test, Y_test))
 #
-exit(0)
+#print_parameters(clf)
+#
+#exit(0)
 #
 #
 #
@@ -146,25 +162,26 @@ for i in range(len(X_test)):
     img = str(str_img[2])+str(str_img[3])+str(str_img[4])
     pac = str(str_img[0])+str(str_img[2])
     pred = np.squeeze(clf.predict_proba(np.array([X_test[i]])))
-#    print("{};{};".format(U_test[i], Y_test[i]), end="")
-#    for j in pred:
-#        print("{:.6f};".format(j), end="")
-#    print()
-    #
-    if(np.argmax(pred) == Y_test[i]):
-        correto += 1
-    total += 1
-    if(img in imgs):
-        imgs[img][1].append(pred)
-    else:
-        imgs[img] = [Y_test[i],list()]
-        imgs[img][1].append(pred)
-    #
-    if(pac in pacs):
-        pacs[pac][1].append(pred)
-    else:
-        pacs[pac] = [Y_test[i],list()]
-        pacs[pac][1].append(pred)
+    print("{};{};".format(U_test[i], Y_test[i]), end="")
+    for j in pred:
+        print("{:.6f};".format(j), end="")
+    print()
+#    #
+#    if(np.argmax(pred) == Y_test[i]):
+#        correto += 1
+#    total += 1
+#    if(img in imgs):
+#        imgs[img][1].append(pred)
+#    else:
+#        imgs[img] = [Y_test[i],list()]
+#        imgs[img][1].append(pred)
+#    #
+#    if(pac in pacs):
+#        pacs[pac][1].append(pred)
+#    else:
+#        pacs[pac] = [Y_test[i],list()]
+#        pacs[pac][1].append(pred)
+exit(0)
 #
 #joblib.dump(pacs, "pacs.pkl")
 #joblib.dump(imgs, "imgs.pkl")
