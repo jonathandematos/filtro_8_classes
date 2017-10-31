@@ -22,13 +22,13 @@ def print_parameters(clf):
     for mean, std, params in zip(means, stds, clf.cv_results_['params']):
         print("%0.3f (+/-%0.03f) for %r" % (mean, std * 2, params))
 #
-if(len(sys.argv) != 3):
-    print("classify_paciente.py [pftas_file_train] [pftas_file_test]")
+if(len(sys.argv) != 4):
+    print("classify_paciente.py [pftas_file] [fold] [ampliacao]")
     exit(0)
 #
-#ampliacao = int(sys.argv[3])
-#pftas_file = sys.argv[1]
-#fold = sys.argv[2]
+ampliacao = int(sys.argv[3])
+pftas_file = sys.argv[1]
+fold = sys.argv[2]
 print("Argumentos: {}".format(sys.argv))
 #
 # Combine results by vote
@@ -58,21 +58,20 @@ def CombineBySum(results):
 #
 #f = open("pftas_filtro_150.txt","r")
 #f = open("svm_tissues/pftas_file_150.txt","r")
-pftas_file_train = sys.argv[1]
-pftas_file_test = sys.argv[2]
-f_train = open(pftas_file_train, "r")
-f_test = open(pftas_file_test, "r")
+f = open(pftas_file, "r")
 #
-#adenosis;SOB_B_A-14-22549CD-100-010-000-300.png;0.329730;0.023730;0.075120;
-#
-def LoadData(f):
-    errados = 0
-    X = list()
-    Y = list()
-    Z = list()
-    for i in f:
-        linha = i[:-1].split(";")
-        a = linha[1].split("-")
+X = list()
+Y = list()
+Z = list()
+W = list()
+U = list()
+errados = 0
+for i in f:
+    linha = i[:-1].split(";")
+    a = linha[1].split("-")
+    if(int(a[3]) == ampliacao):
+        Z.append(linha[1])
+        W.append(str(a[0])+"-"+str(a[1])+"-"+str(a[2])+"-"+str(a[3])+"-"+str(a[4]))
         x_tmp = list()
         for j in linha[2:-1]:
             x_tmp.append(float(j))
@@ -110,14 +109,52 @@ def LoadData(f):
         #if(class_str == 'TA'):
         	class_line = int(3)
         Y.append(class_line)
-        Z.append(linha[1])
-    return X, Y, Z
 #
-X_train, Y_train, Z_train = LoadData(f_train)
-X_test, Y_test, Z_test = LoadData(f_test)
+f.close()
+#print(errados)
+##
+##X_train, X_test, Y_train, Y_test, Z_train, Z_test = train_test_split(X, Y, Z, test_size=0.3)
+##
+F_test = list()
+F_train = list()
+##
+##f = open("svm_tissues/dsfold1.txt","r")
+f = open(fold,"r")
 #
-f_train.close()
-f_test.close()
+for i in f:
+    linha = i[:-1].split("|")
+    if(int(linha[1]) == ampliacao):
+        img = linha[0].split(".")[0]
+        if(linha[3] == "train"):
+            F_train.append(img)
+        else:
+            F_test.append(img)
+f.close()
+#
+X_test = list()
+Y_test = list()
+Z_test = list()
+X_train = list()
+Y_train = list()
+Z_train = list()
+for i in range(len(X)):
+    if(W[i] in F_test):
+        X_test.append(X[i])
+        Y_test.append(Y[i])
+        Z_test.append(Z[i])
+    if(W[i] in F_train):
+        X_train.append(X[i])
+        Y_train.append(Y[i])
+        Z_train.append(Z[i])
+#
+#print(len(X_test), len(X_train))
+#exit(0)
+#
+#for i in U_test:
+#    print(i)
+#exit(0)
+#
+#
 #
 #tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1, 1e-1, 10],
 #                     'C': [5e-1, 50, 5000, 50000]}]
@@ -125,7 +162,7 @@ f_test.close()
 tuned_parameters = [{'kernel': ['rbf'], 'gamma': [1, 1e-1, 5e-1],
                      'C': [1, 100, 1000]}]
 #
-clf = GridSearchCV(SVC(probability=True), tuned_parameters, cv=5, scoring='accuracy', n_jobs=2)
+clf = GridSearchCV(SVC(probability=True), tuned_parameters, cv=5, scoring='accuracy', n_jobs=1)
 #clf = SVC(probability=True)
 #clf = DecisionTreeClassifier()
 #clf = RandomForestClassifier(n_estimators=200)
